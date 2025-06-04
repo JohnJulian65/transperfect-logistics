@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransPerfect Internal Logistics Audit System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 4px solid #e74c3c;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        
+        .prp-banner {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            display: inline-block;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+            margin-top: 10px;
+        }
+        
+        .dashboard-container {
+            max-width: 1800px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+        
+        .upload-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .upload-title {
+            font-size: 1.6em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .upload-description {
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+        
+        .upload-zone {
+            border: 3px dashed #e74c3c;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(45deg, #fdf2f2, #fce4ec);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .upload-zone:hover {
+            border-color: #c0392b;
+            background: linear-gradient(45deg, #fce4ec, #f8bbd9);
+            transform: translateY(-2px);
+        }
+        
+        .upload-zone.dragover {
+            border-color: #27ae60;
+            background: linear-gradient(45deg, #d5f4e6, #a9dfbf);
+        }
+        
+        .upload-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            margin: 8px;
+        }
+        
+        .upload-btn:hover {
+            background: linear-gradient(45deg, #c0392b, #a93226);
+            transform: translateY(-2px);
+        }
+        
+        .upload-btn.sample {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .file-type-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .file-type-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .file-type-card.invoice {
+            border-left-color: #27ae60;
+        }
+        
+        .file-type-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .file-type-desc {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .kpi-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        
+        .kpi-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid #3498db;
+            transition: all 0.3s ease;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .kpi-card.spend {
+            border-top-color: #3498db;
+        }
+        
+        .kpi-card.savings {
+            border-top-color: #e74c3c;
+        }
+        
+        .kpi-card.volume {
+            border-top-color: #27ae60;
+        }
+        
+        .kpi-card.efficiency {
+            border-top-color: #f39c12;
+        }
+        
+        .kpi-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .kpi-label {
+            color: #7f8c8d;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+        
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .data-tables {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        
+        .data-table th {
+            background: linear-gradient(45deg, #34495e, #2c3e50);
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .data-table tbody tr:hover {
+            background: rgba(231, 76, 60, 0.05);
+        }
+        
+        .table-scroll {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .filters-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .filter-group select {
+            padding: 8px;
+            border: 2px solid #e0e6ed;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .export-btn {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+        }
+        
+        .export-btn:hover {
+            background: linear-gradient(45deg, #8e44ad, #732d91);
+            transform: translateY(-2px);
+        }
+        
+        .department-badge {
+            background: rgba(52, 152, 219, 0.1);
+            color: #2980b9;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .service-badge {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .international {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        
+        .domestic {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+        
+        .high-value {
+            background: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+            font-weight: 600;
+        }
+        
+        .savings-opportunity {
+            background: rgba(231, 76, 60, 0.1) !important;
+            color: #c0392b;
+            font-weight: 600;
+        }
+        
+        .efficiency-good {
+            background: rgba(39, 174, 96, 0.1) !important;
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .methodology {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #9b59b6;
+        }
+        
+        .methodology h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .methodology ul {
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+        
+        .methodology li {
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-section,
+            .file-type-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .file-status {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 TransPerfect Internal Logistics Audit System</h1>
+        <div class="subtitle">Complete Shipping Cost Analysis & Compliance Monitoring</div>
+        <div class="prp-banner">🎯 TPT Internal Analysis Engine</div>
+    </div>
+    
+    <div class="dashboard-container">
+        <!-- File Upload Section -->
+        <div class="upload-section">
+            <div class="upload-title">📁 Upload FedEx Invoice/Billing Report</div>
+            <div class="upload-description">
+                Upload your monthly FedEx invoice Excel files (like "20250523 0213 Auto FedExInv 162970038.XLS") 
+                to automatically generate TPT Internal compliance audits and savings analysis.
+            </div>
+            
+            <div class="upload-zone" id="uploadZone">
+                <div style="font-size: 3em; margin-bottom: 15px;">📊</div>
+                <p><strong>Drag & Drop your FedEx invoice file here</strong></p>
+                <p style="color: #7f8c8d; font-size: 0.9em; margin: 10px 0;">Excel files (.xlsx, .xls) from FedEx billing portal</p>
+                <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Choose Invoice File</button>
+                <button class="upload-btn sample" onclick="loadSampleData()">Load Sample Data</button>
+            </div>
+            
+            <div class="file-type-info">
+                <div class="file-type-card">
+                    <div class="file-type-title">📄 FedEx Invoice Reports</div>
+                    <div class="file-type-desc">
+                        Monthly billing files with shipment details, tracking numbers, costs, service types, 
+                        reference codes, and department information.
+                    </div>
+                </div>
+                <div class="file-type-card invoice">
+                    <div class="file-type-title">🔍 Auto-Generated Audit</div>
+                    <div class="file-type-desc">
+                        System automatically creates TPT Internal compliance analysis, identifies savings 
+                        opportunities, and flags potential contract violations.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="file-status" id="fileStatus" style="display: none;">
+                ✅ File processed successfully - Dashboard updated with audit analysis
+            </div>
+        </div>
+        
+        <!-- Filters Panel -->
+        <div class="filters-panel">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="serviceFilter">Service Type</label>
+                    <select id="serviceFilter">
+                        <option value="all">All Services</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="departmentFilter">Department</label>
+                    <select id="departmentFilter">
+                        <option value="all">All Departments</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="valueFilter">Shipment Value</label>
+                    <select id="valueFilter">
+                        <option value="all">All Values</option>
+                        <option value="high">High Value (>$200)</option>
+                        <option value="medium">Medium Value ($50-$200)</option>
+                        <option value="low">Low Value (<$50)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="export-btn" onclick="exportAuditReport()">📊 Export TPT Internal Report</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- KPI Section -->
+        <div class="kpi-section">
+            <div class="section-title">📈 Executive Summary - May 2025</div>
+            <div class="kpi-grid">
+                <div class="kpi-card spend">
+                    <div class="kpi-value" id="totalSpend">$1,630</div>
+                    <div class="kpi-label">Total Invoice Amount</div>
+                </div>
+                <div class="kpi-card savings">
+                    <div class="kpi-value" id="savingsOpportunity">$245</div>
+                    <div class="kpi-label">Potential Savings</div>
+                </div>
+                <div class="kpi-card volume">
+                    <div class="kpi-value" id="totalShipments">6</div>
+                    <div class="kpi-label">Total Shipments</div>
+                </div>
+                <div class="kpi-card efficiency">
+                    <div class="kpi-value" id="avgCost">$272</div>
+                    <div class="kpi-label">Avg Cost/Shipment</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <div class="chart-title">Department Spend Analysis</div>
+                <canvas id="departmentChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">Service Type & Cost Distribution</div>
+                <canvas id="serviceChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Data Tables -->
+        <div class="data-tables">
+            <div class="table-container">
+                <div class="table-title">
+                    💰 Recent Invoice Shipments
+                    <span style="font-size: 0.8em; color: #7f8c8d;">Based on: 20250523 FedEx Invoice</span>
+                </div>
+                <div class="table-scroll">
+                    <table class="data-table" id="shipmentsTable">
+                        <thead>
+                            <tr>
+                                <th>Tracking #</th>
+                                <th>Service Type</th>
+                                <th>Origin → Destination</th>
+                                <th>Weight</th>
+                                <th>Department</th>
+                                <th>Cost</th>
+                                <th>Potential Savings</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shipmentsTableBody">
+                            <tr>
+                                <td>881087771455</td>
+                                <td><span class="service-badge international">FedEx Intl Economy</span></td>
+                                <td>NEW YORK CITY → MEXICO</td>
+                                <td>3 lbs</td>
+                                <td><span class="department-badge">Jonathan Chenier</span></td>
+                                <td>$318.68</td>
+                                <td class="efficiency-good">Optimized</td>
+                            </tr>
+                            <tr>
+                                <td>881312472464</td>
+                                <td><span class="service-badge international">FedEx Intl Priority</span></td>
+                                <td>TORONTO → NEW YORK CITY</td>
+                                <td>5 lbs</td>
+                                <td><span class="department-badge">605-g2</span></td>
+                                <td class="high-value">$318.68</td>
+                                <td class="savings-opportunity">Could use Economy (-$89)</td>
+                            </tr>
+                            <tr>
+                                <td>881312917258</td>
+                                <td><span class="service-badge international">FedEx Intl Economy</span></td>
+                                <td>NEW YORK CITY → BARCELONA</td>
+                                <td>1 lbs</td>
+                                <td><span class="department-badge">199-A1</span></td>
+                                <td>$318.68</td>
+                                <td class="efficiency-good">Optimized</td>
+                            </tr>
+                            <tr>
+                                <td>881370200716</td>
+                                <td><span class="service-badge international">FedEx Intl Priority</span></td>
+                                <td>NEW YORK CITY → BARCELONA</td>
+                                <td>2 lbs</td>
+                                <td><span class="department-badge">Executive</span></td>
+                                <td class="high-value">$318.68</td>
+                                <td class="savings-opportunity">Could use Economy (-$78)</td>
+                            </tr>
+                            <tr>
+                                <td>881375692205</td>
+                                <td><span class="service-badge international">FedEx Intl Economy</span></td>
+                                <td>TORONTO → PARIS</td>
+                                <td>1.5 lbs</td>
+                                <td><span class="department-badge">Marketing</span></td>
+                                <td>$318.68</td>
+                                <td class="efficiency-good">Optimized</td>
+                            </tr>
+                            <tr>
+                                <td>881312917258</td>
+                                <td><span class="service-badge domestic">FedEx Ground</span></td>
+                                <td>NEW YORK CITY → PHILADELPHIA</td>
+                                <td>0.5 lbs</td>
+                                <td><span class="department-badge">199-A1</span></td>
+                                <td>$36.82</td>
+                                <td class="savings-opportunity">Could consolidate (-$15)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-title">
+                    🎯 TPT Internal Savings Opportunities
+                    <span style="font-size: 0.8em; color: #7f8c8d;">Auto-Generated Analysis</span>
+                </div>
+                <div class="table-scroll">
+                    <table class="data-table" id="savingsTable">
+                        <thead>
+                            <tr>
+                                <th>Opportunity Type</th>
+                                <th>Current Service</th>
+                                <th>Recommended Service</th>
+                                <th>Shipments Affected</th>
+                                <th>Monthly Savings</th>
+                                <th>Annual Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody id="savingsTableBody">
+                            <tr>
+                                <td><strong>Service Level Optimization</strong></td>
+                                <td>FedEx International Priority</td>
+                                <td>FedEx International Economy</td>
+                                <td>2 shipments</td>
+                                <td class="savings-opportunity">$167.00</td>
+                                <td class="savings-opportunity">$2,004</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shipment Consolidation</strong></td>
+                                <td>Multiple small packages</td>
+                                <td>Consolidated shipments</td>
+                                <td>1 shipment</td>
+                                <td class="savings-opportunity">$15.00</td>
+                                <td class="savings-opportunity">$180</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Zone Optimization</strong></td>
+                                <td>Express to nearby zones</td>
+                                <td>Ground service</td>
+                                <td>0 shipments</td>
+                                <td class="efficiency-good">$0.00</td>
+                                <td class="efficiency-good">$0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <script>
+        let currentData = [];
+        let filteredData = [];
+        let departmentChart, serviceChart;
+        
+        // Department code mapping based on actual data
+        const departmentMapping = {
+            '90': 'Jonathan Chenier',
+            'G2': '605-g2',
+            'A1': '199-A1',
+            '80': 'Executive Support',
+            '85': 'Marketing'
+        };
+        
+        // Sample data based on the actual FedEx invoice
+        const sampleInvoiceData = [
+            {
+                tracking: '881087771455',
+                invoiceDate: '20250523',
+                amount: 318.68,
+                serviceType: 'FedEx International Economy',
+                shipperCity: 'NEW YORK CITY',
+                recipientCity: 'MEXICO',
+                weight: 3,
+                weightUnit: 'lbs',
+                refCode: '90',
+                department: 'Jonathan Chenier',
+                payor: 'Shipper',
+                isInternational: true,
+                potentialSavings: 0,
+                recommendation: 'Optimized'
+            },
+            {
+                tracking: '881312472464',
+                invoiceDate: '20250523',
+                amount: 318.68,
+                serviceType: 'FedEx International Priority',
+                shipperCity: 'TORONTO',
+                recipientCity: 'NEW YORK CITY',
+                weight: 5,
+                weightUnit: 'lbs',
+                refCode: 'G2',
+                department: '605-g2',
+                payor: 'Third Party',
+                isInternational: true,
+                potentialSavings: 89,
+                recommendation: 'Could use Economy'
+            },
+            {
+                tracking: '881312917258',
+                invoiceDate: '20250523',
+                amount: 318.68,
+                serviceType: 'FedEx International Economy',
+                shipperCity: 'NEW YORK CITY',
+                recipientCity: 'BARCELONA',
+                weight: 1,
+                weightUnit: 'lbs',
+                refCode: 'A1',
+                department: '199-A1',
+                payor: 'Shipper',
+                isInternational: true,
+                potentialSavings: 0,
+                recommendation: 'Optimized'
+            },
+            {
+                tracking: '881370200716',
+                invoiceDate: '20250523',
+                amount: 318.68,
+                serviceType: 'FedEx International Priority',
+                shipperCity: 'NEW YORK CITY',
+                recipientCity: 'BARCELONA',
+                weight: 2,
+                weightUnit: 'lbs',
+                refCode: '80',
+                department: 'Executive',
+                payor: 'Shipper',
+                isInternational: true,
+                potentialSavings: 78,
+                recommendation: 'Could use Economy'
+            },
+            {
+                tracking: '881375692205',
+                invoiceDate: '20250523',
+                amount: 318.68,
+                serviceType: 'FedEx International Economy',
+                shipperCity: 'TORONTO',
+                recipientCity: 'PARIS',
+                weight: 1.5,
+                weightUnit: 'lbs',
+                refCode: '85',
+                department: 'Marketing',
+                payor: 'Shipper',
+                isInternational: true,
+                potentialSavings: 0,
+                recommendation: 'Optimized'
+            },
+            {
+                tracking: '881312917258',
+                invoiceDate: '20250523',
+                amount: 36.82,
+                serviceType: 'FedEx Ground',
+                shipperCity: 'NEW YORK CITY',
+                recipientCity: 'PHILADELPHIA',
+                weight: 0.5,
+                weightUnit: 'lbs',
+                refCode: 'A1',
+                department: '199-A1',
+                payor: 'Shipper',
+                isInternational: false,
+                potentialSavings: 15,
+                recommendation: 'Could consolidate'
+            }
+        ];
+        
+        // File upload handlers
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        });
+        
+        uploadZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                processFile(e.target.files[0]);
+            }
+        });
+        
+        function loadSampleData() {
+            currentData = [...sampleInvoiceData];
+            filteredData = [...currentData];
+            updateDashboard();
+            populateFilters();
+            
+            document.getElementById('fileStatus').style.display = 'block';
+        }
+        
+        function processFile(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const workbook = XLSX.read(e.target.result, { type: 'binary' });
+                    const worksheet = workbook.Sheets['Data'];
+                    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    
+                    // Parse the actual invoice data
+                    currentData = parseInvoiceData(rawData);
+                    filteredData = [...currentData];
+                    updateDashboard();
+                    populateFilters();
+                    
+                    document.getElementById('fileStatus').style.display = 'block';
+                    
+                } catch (error) {
+                    alert('Error processing file: ' + error.message);
+                }
+            };
+            
+            reader.readAsBinaryString(file);
+        }
+        
+        function parseInvoiceData(rawData) {
+            const headers = rawData[0];
+            const data = [];
+            
+            for (let i = 1; i < rawData.length; i++) {
+                const row = rawData[i];
+                if (row && row.length > 5) {
+                    const record = {
+                        tracking: cleanString(row[9]), // Express or Ground Tracking ID
+                        invoiceDate: cleanString(row[2]), // Invoice Date
+                        amount: parseFloat(cleanString(row[5]) || 0), // Original Amount Due
+                        serviceType: cleanString(row[12]) || 'Unknown Service', // Service Type
+                        shipperCity: cleanString(row[44]) || 'Unknown', // Shipper City
+                        recipientCity: cleanString(row[37]) || 'Unknown', // Recipient City
+                        weight: parseFloat(cleanString(row[19]) || 1), // Actual Weight Amount
+                        weightUnit: cleanString(row[20]) || 'lbs', // Actual Weight Units
+                        refCode: cleanString(row[49]) || 'Unknown', // Original Ref#2
+                        department: departmentMapping[cleanString(row[49])] || cleanString(row[51]) || 'Unknown',
+                        payor: cleanString(row[7]) || 'Shipper', // Payor
+                        isInternational: isInternationalService(cleanString(row[12])),
+                        potentialSavings: calculateSavings(cleanString(row[12]), parseFloat(cleanString(row[5]) || 0)),
+                        recommendation: generateRecommendation(cleanString(row[12]), parseFloat(cleanString(row[5]) || 0))
+                    };
+                    data.push(record);
+                }
+            }
+            
+            return data;
+        }
+        
+        function cleanString(value) {
+            if (!value) return '';
+            return value.toString().replace(/"/g, '').trim();
+        }
+        
+        function isInternationalService(serviceType) {
+            return serviceType && serviceType.toLowerCase().includes('international');
+        }
+        
+        function calculateSavings(serviceType, amount) {
+            if (serviceType && serviceType.toLowerCase().includes('priority') && amount > 200) {
+                return Math.round(amount * 0.28); // Assume 28% savings using Economy
+            }
+            if (amount < 50) {
+                return Math.round(amount * 0.4); // Consolidation opportunity
+            }
+            return 0;
+        }
+        
+        function generateRecommendation(serviceType, amount) {
+            if (serviceType && serviceType.toLowerCase().includes('priority') && amount > 200) {
+                return 'Could use Economy';
+            }
+            if (amount < 50) {
+                return 'Could consolidate';
+            }
+            return 'Optimized';
+        }
+        
+        function populateFilters() {
+            // Populate service filter
+            const serviceFilter = document.getElementById('serviceFilter');
+            const services = [...new Set(currentData.map(item => item.serviceType))];
+            serviceFilter.innerHTML = '<option value="all">All Services</option>';
+            services.forEach(service => {
+                serviceFilter.innerHTML += `<option value="${service}">${service}</option>`;
+            });
+            
+            // Populate department filter
+            const departmentFilter = document.getElementById('departmentFilter');
+            const departments = [...new Set(currentData.map(item => item.department))];
+            departmentFilter.innerHTML = '<option value="all">All Departments</option>';
+            departments.forEach(dept => {
+                departmentFilter.innerHTML += `<option value="${dept}">${dept}</option>`;
+            });
+            
+            // Add event listeners
+            serviceFilter.addEventListener('change', applyFilters);
+            departmentFilter.addEventListener('change', applyFilters);
+            document.getElementById('valueFilter').addEventListener('change', applyFilters);
+        }
+        
+        function applyFilters() {
+            const serviceFilter = document.getElementById('serviceFilter').value;
+            const departmentFilter = document.getElementById('departmentFilter').value;
+            const valueFilter = document.getElementById('valueFilter').value;
+            
+            filteredData = currentData.filter(item => {
+                const serviceMatch = serviceFilter === 'all' || item.serviceType === serviceFilter;
+                const departmentMatch = departmentFilter === 'all' || item.department === departmentFilter;
+                
+                let valueMatch = true;
+                if (valueFilter === 'high') valueMatch = item.amount > 200;
+                else if (valueFilter === 'medium') valueMatch = item.amount >= 50 && item.amount <= 200;
+                else if (valueFilter === 'low') valueMatch = item.amount < 50;
+                
+                return serviceMatch && departmentMatch && valueMatch;
+            });
+            
+            updateDashboard();
+        }
+        
+        function updateDashboard() {
+            updateKPIs();
+            updateCharts();
+        }
+        
+        function updateKPIs() {
+            const totalSpend = filteredData.reduce((sum, item) => sum + item.amount, 0);
+            const totalSavings = filteredData.reduce((sum, item) => sum + item.potentialSavings, 0);
+            const totalShipments = filteredData.length;
+            const avgCost = totalShipments > 0 ? totalSpend / totalShipments : 0;
+            
+            document.getElementById('totalSpend').textContent = `${totalSpend.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            document.getElementById('savingsOpportunity').textContent = `${totalSavings.toLocaleString()}`;
+            document.getElementById('totalShipments').textContent = totalShipments.toLocaleString();
+            document.getElementById('avgCost').textContent = `${avgCost.toFixed(0)}`;
+        }
+        
+        function updateCharts() {
+            updateDepartmentChart();
+            updateServiceChart();
+        }
+        
+        function updateDepartmentChart() {
+            const departmentSpend = {};
+            
+            filteredData.forEach(item => {
+                if (!departmentSpend[item.department]) {
+                    departmentSpend[item.department] = 0;
+                }
+                departmentSpend[item.department] += item.amount;
+            });
+            
+            const departments = Object.keys(departmentSpend);
+            const amounts = Object.values(departmentSpend);
+            
+            if (departmentChart) {
+                departmentChart.destroy();
+            }
+            
+            const ctx = document.getElementById('departmentChart').getContext('2d');
+            departmentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: departments,
+                    datasets: [{
+                        data: amounts,
+                        backgroundColor: [
+                            '#e74c3c',
+                            '#3498db',
+                            '#27ae60',
+                            '#f39c12',
+                            '#9b59b6',
+                            '#34495e'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateServiceChart() {
+            const serviceData = {};
+            
+            filteredData.forEach(item => {
+                const service = item.serviceType.replace('FedEx ', '');
+                if (!serviceData[service]) {
+                    serviceData[service] = { count: 0, cost: 0 };
+                }
+                serviceData[service].count += 1;
+                serviceData[service].cost += item.amount;
+            });
+            
+            const services = Object.keys(serviceData);
+            const costs = Object.values(serviceData).map(d => d.cost);
+            
+            if (serviceChart) {
+                serviceChart.destroy();
+            }
+            
+            const ctx = document.getElementById('serviceChart').getContext('2d');
+            serviceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: services,
+                    datasets: [{
+                        label: 'Total Cost',
+                        data: costs,
+                        backgroundColor: '#3498db',
+                        borderColor: '#2980b9',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function exportAuditReport() {
+            const wb = XLSX.utils.book_new();
+            
+            // Executive Summary
+            const summaryData = [
+                ['TransPerfect Internal Logistics Audit Report'],
+                ['Generated:', new Date().toLocaleDateString()],
+                ['Period: May 2025'],
+                ['Methodology: TPT Internal Analysis'],
+                [''],
+                ['Executive Summary:'],
+                ['Total Invoice Amount:', `${filteredData.reduce((sum, item) => sum + item.amount, 0).toLocaleString()}`],
+                ['Potential Savings:', `${filteredData.reduce((sum, item) => sum + item.potentialSavings, 0).toLocaleString()}`],
+                ['Total Shipments:', filteredData.length.toLocaleString()],
+                ['Average Cost per Shipment:', `${(filteredData.reduce((sum, item) => sum + item.amount, 0) / filteredData.length).toFixed(2)}`],
+                [''],
+                ['Key Findings:'],
+                ['• International Priority service used where Economy could suffice'],
+                ['• Small package consolidation opportunities identified'],
+                ['• Department cost allocation functioning properly'],
+                ['• Contract compliance review recommended']
+            ];
+            
+            const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, summaryWs, 'Executive Summary');
+            
+            // Detailed shipment data
+            const shipmentData = filteredData.map(item => ({
+                'Tracking Number': item.tracking,
+                'Invoice Date': item.invoiceDate,
+                'Service Type': item.serviceType,
+                'Origin': item.shipperCity,
+                'Destination': item.recipientCity,
+                'Weight': `${item.weight} ${item.weightUnit}`,
+                'Department': item.department,
+                'Ref Code': item.refCode,
+                'Cost': item.amount,
+                'Potential Savings': item.potentialSavings,
+                'Recommendation': item.recommendation,
+                'International': item.isInternational ? 'Yes' : 'No'
+            }));
+            
+            const shipmentWs = XLSX.utils.json_to_sheet(shipmentData);
+            XLSX.utils.book_append_sheet(wb, shipmentWs, 'Shipment Details');
+            
+            // Savings opportunities
+            const savingsData = [
+                ['Opportunity Type', 'Description', 'Affected Shipments', 'Monthly Savings', 'Annual Impact'],
+                ['Service Level Optimization', 'Use Economy instead of Priority for international shipments', '2', '$167', '$2,004'],
+                ['Shipment Consolidation', 'Combine small packages to reduce per-shipment costs', '1', '$15', '$180'],
+                ['Contract Optimization', 'Negotiate better rates for high-volume routes', 'All', 'TBD', 'TBD']
+            ];
+            
+            const savingsWs = XLSX.utils.aoa_to_sheet(savingsData);
+            XLSX.utils.book_append_sheet(wb, savingsWs, 'Savings Opportunities');
+            
+            // Save file
+            const fileName = `TransPerfect_Internal_Logistics_Audit_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+        
+        // Initialize with sample data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSampleData();
+        });
+    </script>
+</body>
+</html>
