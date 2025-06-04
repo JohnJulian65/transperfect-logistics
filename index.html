@@ -532,11 +532,11 @@
             <div class="section-title">📈 Executive Summary - May 2025</div>
             <div class="kpi-grid">
                 <div class="kpi-card spend">
-                    <div class="kpi-value" id="totalSpend">$1,630</div>
+                    <div class="kpi-value" id="totalSpend">$356</div>
                     <div class="kpi-label">Total Invoice Amount</div>
                 </div>
                 <div class="kpi-card savings">
-                    <div class="kpi-value" id="savingsOpportunity">$245</div>
+                    <div class="kpi-value" id="savingsOpportunity">$106</div>
                     <div class="kpi-label">Potential Savings</div>
                 </div>
                 <div class="kpi-card volume">
@@ -544,7 +544,7 @@
                     <div class="kpi-label">Total Shipments</div>
                 </div>
                 <div class="kpi-card efficiency">
-                    <div class="kpi-value" id="avgCost">$272</div>
+                    <div class="kpi-value" id="avgCost">$59</div>
                     <div class="kpi-label">Avg Cost/Shipment</div>
                 </div>
             </div>
@@ -589,7 +589,7 @@
                                 <td>NEW YORK CITY → MEXICO</td>
                                 <td>3 lbs</td>
                                 <td><span class="department-badge">Jonathan Chenier</span></td>
-                                <td>$318.68</td>
+                                <td>$22.33</td>
                                 <td class="efficiency-good">Optimized</td>
                             </tr>
                             <tr>
@@ -598,7 +598,7 @@
                                 <td>TORONTO → NEW YORK CITY</td>
                                 <td>5 lbs</td>
                                 <td><span class="department-badge">605-g2</span></td>
-                                <td class="high-value">$318.68</td>
+                                <td class="high-value">$212.05</td>
                                 <td class="savings-opportunity">Could use Economy (-$89)</td>
                             </tr>
                             <tr>
@@ -607,7 +607,7 @@
                                 <td>NEW YORK CITY → BARCELONA</td>
                                 <td>1 lbs</td>
                                 <td><span class="department-badge">199-A1</span></td>
-                                <td>$318.68</td>
+                                <td>$31.65</td>
                                 <td class="efficiency-good">Optimized</td>
                             </tr>
                             <tr>
@@ -616,8 +616,8 @@
                                 <td>NEW YORK CITY → BARCELONA</td>
                                 <td>2 lbs</td>
                                 <td><span class="department-badge">Executive</span></td>
-                                <td class="high-value">$318.68</td>
-                                <td class="savings-opportunity">Could use Economy (-$78)</td>
+                                <td class="high-value">$25.05</td>
+                                <td class="savings-opportunity">Could use Economy (-$12)</td>
                             </tr>
                             <tr>
                                 <td>881375692205</td>
@@ -625,7 +625,7 @@
                                 <td>TORONTO → PARIS</td>
                                 <td>1.5 lbs</td>
                                 <td><span class="department-badge">Marketing</span></td>
-                                <td>$318.68</td>
+                                <td>$27.60</td>
                                 <td class="efficiency-good">Optimized</td>
                             </tr>
                             <tr>
@@ -635,7 +635,7 @@
                                 <td>0.5 lbs</td>
                                 <td><span class="department-badge">199-A1</span></td>
                                 <td>$36.82</td>
-                                <td class="savings-opportunity">Could consolidate (-$15)</td>
+                                <td class="savings-opportunity">Could consolidate (-$5)</td>
                             </tr>
                         </tbody>
                     </table>
@@ -665,16 +665,16 @@
                                 <td>FedEx International Priority</td>
                                 <td>FedEx International Economy</td>
                                 <td>2 shipments</td>
-                                <td class="savings-opportunity">$167.00</td>
-                                <td class="savings-opportunity">$2,004</td>
+                                <td class="savings-opportunity">$101.00</td>
+                                <td class="savings-opportunity">$1,212</td>
                             </tr>
                             <tr>
                                 <td><strong>Shipment Consolidation</strong></td>
                                 <td>Multiple small packages</td>
                                 <td>Consolidated shipments</td>
                                 <td>1 shipment</td>
-                                <td class="savings-opportunity">$15.00</td>
-                                <td class="savings-opportunity">$180</td>
+                                <td class="savings-opportunity">$5.00</td>
+                                <td class="savings-opportunity">$60</td>
                             </tr>
                             <tr>
                                 <td><strong>Zone Optimization</strong></td>
@@ -706,12 +706,12 @@
             '85': 'Marketing'
         };
         
-        // Sample data based on the actual FedEx invoice
+        // Sample data based on the actual FedEx invoice with CORRECT costs
         const sampleInvoiceData = [
             {
                 tracking: '881087771455',
                 invoiceDate: '20250523',
-                amount: 318.68,
+                amount: 22.33,
                 serviceType: 'FedEx International Economy',
                 shipperCity: 'NEW YORK CITY',
                 recipientCity: 'MEXICO',
@@ -727,7 +727,7 @@
             {
                 tracking: '881312472464',
                 invoiceDate: '20250523',
-                amount: 318.68,
+                amount: 212.05,
                 serviceType: 'FedEx International Priority',
                 shipperCity: 'TORONTO',
                 recipientCity: 'NEW YORK CITY',
@@ -743,7 +743,7 @@
             {
                 tracking: '881312917258',
                 invoiceDate: '20250523',
-                amount: 318.68,
+                amount: 31.65,
                 serviceType: 'FedEx International Economy',
                 shipperCity: 'NEW YORK CITY',
                 recipientCity: 'BARCELONA',
@@ -759,7 +759,7 @@
             {
                 tracking: '881370200716',
                 invoiceDate: '20250523',
-                amount: 318.68,
+                amount: 25.05,
                 serviceType: 'FedEx International Priority',
                 shipperCity: 'NEW YORK CITY',
                 recipientCity: 'BARCELONA',
@@ -769,13 +769,13 @@
                 department: 'Executive',
                 payor: 'Shipper',
                 isInternational: true,
-                potentialSavings: 78,
+                potentialSavings: 12,
                 recommendation: 'Could use Economy'
             },
             {
                 tracking: '881375692205',
                 invoiceDate: '20250523',
-                amount: 318.68,
+                amount: 27.60,
                 serviceType: 'FedEx International Economy',
                 shipperCity: 'TORONTO',
                 recipientCity: 'PARIS',
@@ -801,7 +801,7 @@
                 department: '199-A1',
                 payor: 'Shipper',
                 isInternational: false,
-                potentialSavings: 15,
+                potentialSavings: 5,
                 recommendation: 'Could consolidate'
             }
         ];
